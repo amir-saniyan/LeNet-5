@@ -14,7 +14,7 @@ class LeNet5:
 
     def create_network(self):
 
-        # Input.
+        # Input: 32x32x1.
 
         X = tf.placeholder(dtype=tf.float32, shape=[None, 32, 32, self.channels], name='X')
 
@@ -23,6 +23,11 @@ class LeNet5:
         Y = tf.placeholder(dtype=tf.float32, shape=[None, 10], name='Y')
 
         # Layer 1.
+        # [Input] :: 32x32x1
+        # --> [Conv Filter: 5x5x6, strides=1, padding=valid] :: 28x28x6
+        # --> [Activation: ReLU] :: 28x28x6
+        # --> [Max-Pool: 2x2, strides=2, padding=valid] :: 14x14x6
+        # --> [Output] :: 14x14x6
 
         conv1_filters = tf.Variable(self.__random_values(shape=[5, 5, self.channels, 6]), name='conv1_filters')
         conv1_convs = tf.nn.conv2d(input=X, filter=conv1_filters, strides=[1, 1, 1, 1], padding='VALID',
@@ -35,6 +40,11 @@ class LeNet5:
                                name='pool1')
 
         # Layer 2.
+        # [Input] :: 14x14x6
+        # --> [Conv Filter: 5x5x16, strides=1, padding=valid] :: 10x10x16
+        # --> [Activation: ReLU] :: 10x10x16
+        # --> [Max-Pool: 2x2, strides=2, padding=valid] :: 5x5x16
+        # --> [Output] :: 5x5x16
 
         conv2_filters = tf.Variable(self.__random_values(shape=[5, 5, 6, 16]), name='conv2_filters')
         conv2_convs = tf.nn.conv2d(input=pool1, filter=conv2_filters, strides=[1, 1, 1, 1], padding='VALID',
@@ -47,6 +57,9 @@ class LeNet5:
                                name='pool2')
 
         # Layer 3.
+        # [Input] :: 5x5x16 = 400
+        # --> [Activation: ReLU]
+        # --> [Output] :: 120
 
         fc3_wights = tf.Variable(self.__random_values(shape=[400, 120]), name='fc3_wights')
         fc3_biases = tf.Variable(tf.zeros(shape=[120], dtype=tf.float32), name='fc3_biases')
@@ -55,6 +68,9 @@ class LeNet5:
         fc3_activations = tf.nn.relu(fc3_preactivations, name='fc3_activations')
 
         # Layer 4.
+        # [Input] :: 120
+        # --> [Activation: ReLU]
+        # --> [Output] :: 84
 
         fc4_wights = tf.Variable(self.__random_values(shape=[120, 84]), name='fc4_wights')
         fc4_biases = tf.Variable(tf.zeros(shape=[84], dtype=tf.float32), name='fc4_biases')
@@ -62,6 +78,8 @@ class LeNet5:
         fc4_activations = tf.nn.relu(fc4_preactivations, name='fc4_activations')
 
         # Layer 5.
+        # [Input] :: 84
+        # --> [Output] :: 10
 
         fc5_wights = tf.Variable(self.__random_values(shape=[84, 10]), name='fc5_wights')
         fc5_biases = tf.Variable(tf.zeros(shape=[10], dtype=tf.float32), name='fc5_biases')
@@ -101,6 +119,21 @@ class LeNet5:
             accuracy = sess.run(accuracy_operation, feed_dict={X: batch_x, Y: batch_y})
             total_accuracy += (accuracy * len(batch_x))
         return total_accuracy / num_examples
+
+    def save(self, sess, file_name):
+        saver = tf.train.Saver()
+        saver.save(sess, file_name)
+
+    def restore(self, sess, file_name, checkpoint_dir):
+        saver = tf.train.import_meta_graph(file_name)
+        saver.restore(sess, tf.train.latest_checkpoint(checkpoint_dir))
+        graph = sess.graph
+        X = graph.get_tensor_by_name('X:0')
+        Y = graph.get_tensor_by_name('Y:0')
+        logits = graph.get_tensor_by_name('fc5_logits:0')
+        training_operation = graph.get_operation_by_name('training_operation')
+        accuracy_operation = graph.get_tensor_by_name('accuracy_operation:0')
+        return X, Y, logits, training_operation, accuracy_operation
 
     def __random_values(self, shape):
         return tf.random_normal(shape=shape, mean=self.random_mean, stddev=self.random_stddev, dtype=tf.float32)

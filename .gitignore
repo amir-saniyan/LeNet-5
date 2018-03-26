@@ -1,8 +1,2 @@
 .idea/
 __pycache__/
-
-mnist/model/*
-!mnist/model/.gitkeep
-
-hoda/model/*
-!hoda/model/.gitkeep

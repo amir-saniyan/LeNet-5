@@ -18,8 +18,6 @@ with tf.Session() as sess:
     print('Training hoda dataset...')
     print()
 
-    saver = tf.train.Saver()
-
     sess.run(tf.global_variables_initializer())
 
     for i in range(EPOCHS):
@@ -49,7 +47,7 @@ with tf.Session() as sess:
     print('Final Remaining Accuracy = {:.3f}'.format(final_remaining_accuracy))
     print()
 
-    saver.save(sess, './hoda/model/lenet5')
+    lenet5.save(sess, './hoda/model/lenet5')
     print('Model saved.')
     print()
 

@@ -18,8 +18,6 @@ with tf.Session() as sess:
     print('Training mnist dataset...')
     print()
 
-    saver = tf.train.Saver()
-
     sess.run(tf.global_variables_initializer())
 
     for i in range(EPOCHS):
@@ -48,7 +46,7 @@ with tf.Session() as sess:
     print('Final Validation Accuracy = {:.3f}'.format(final_validation_accuracy))
     print()
 
-    saver.save(sess, './mnist/model/lenet5')
+    lenet5.save(sess, './mnist/model/lenet5')
     print('Model saved.')
     print()
 
