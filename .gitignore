@@ -1,2 +1,4 @@
 .idea/
+mnist/log/
+hoda/log/
 __pycache__/
