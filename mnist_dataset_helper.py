@@ -1,4 +1,4 @@
-# *-* coding: utf-8 *-
+# -*- coding: utf-8 -*-
 
 import numpy as np
 from tensorflow.examples.tutorials.mnist import input_data
